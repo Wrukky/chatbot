@@ -1,24 +1,24 @@
+import os
 import base64
 import requests
 from io import BytesIO
 from PIL import Image
 
-# Function to encode image
-def encode_image(img_path):
-    img = Image.open(img_path)
-    buffered = BytesIO()
-    img.save(buffered, format="PNG")
-    encoded_string = base64.b64encode(buffered.getvalue()).decode("utf-8")
-    return encoded_string
-
-# API details
-API_URL = "https://api.hyperbolic.xyz/v1/chat/completions"
-API_KEY = "your_api_key_here"  # Replace with your actual API key
+# Load API details from environment variables
+API_URL = os.getenv("API_URL")
+API_KEY = os.getenv("API_KEY")
 
 HEADERS = {
     "Content-Type": "application/json",
     "Authorization": f"Bearer {API_KEY}",
 }
+
+# Function to encode an image to base64
+def encode_image(img_path):
+    img = Image.open(img_path)
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode("utf-8")
 
 # Function to send image to Pixtral API
 def chat_with_pixtral(image_path, text_prompt):
@@ -44,13 +44,11 @@ def chat_with_pixtral(image_path, text_prompt):
     }
 
     response = requests.post(API_URL, headers=HEADERS, json=payload)
-    
     return response.json()
 
 # Run chatbot
 if __name__ == "__main__":
-    image_path = "path_to_your_image.png"  # Change this to an actual image path
+    image_path = "path_to_your_image.png"  # Replace with an actual image path
     prompt = "What is in this image?"
     response = chat_with_pixtral(image_path, prompt)
-    
     print(response)
